@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "paymentStatus",
+  "description": "Статус платежа",
+  "type": "object",
+  "properties": {
+    "paymentId": {
+      "description": "Уникальный ID платежа",
+      "type": "string",
+      "example": "payment_id_123"
+    },
+    "status": {
+      "description": "Статус платежа",
+      "type": "string",
+      "example": "EXECUTED"
+    },
+    "description": {
+      "description": "Описание ошибки",
+      "type": "string",
+      "example": "Проверьте ИНН получателя — возможно, вы указали неправильные цифры"
+    }
+  },
+  "required": [
+    "paymentId",
+    "status"
+  ]
+}

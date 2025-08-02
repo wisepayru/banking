@@ -1,0 +1,354 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema", 
+  "title": "operations",
+  "description": "Операции по счёту",
+  "type": "object",
+  "properties": {
+    "operationId": {
+      "description": "Уникальный ID операции",
+      "type": "string",
+      "example": "64be58f9-c7fc-0027-96ba-763ec56a2317"
+    },
+    "typeOfOperation": {
+      "description": "Тип операции",
+      "type": "string",
+      "example": "Credit"
+    },
+    "accountNumber": {
+      "description": "Номер счёта",
+      "type": "string",
+      "example": "40702810510000710417"
+    },
+    "documentNumber": {
+      "description": "Номер документа",
+      "type": "string",
+      "example": "175926"
+    },
+    "operationAmount": {
+      "description": "Сумма в валюте операции",
+      "type": "string",
+      "example": "500.01"
+    },
+    "operationCurrencyDigitalCode": {
+      "description": "Код валюты операции",
+      "type": "string",
+      "example": "643"
+    },
+    "accountAmount": {
+      "description": "Сумма в валюте счёта",
+      "type": "string",
+      "example": "500.01"
+    },
+    "accountCurrencyDigitalCode": {
+      "description": "Код валюты счёта",
+      "type": "string",
+      "example": "643"
+    },
+    "rubleAmount": {
+      "description": "Сумма операции в рублях по курсу ЦБ на дату проведения операции",
+      "type": "string",
+      "example": "500.01"
+    },
+    "counterParty": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "description": "Номер счёта контрагента",
+          "type": "string",
+          "example": "40702810510000710417"
+        },
+        "bankBic": {
+          "description": "БИК банка контрагента",
+          "type": "string",
+          "example": "044525974"
+        },
+        "bankName": {
+          "description": "Название банка контрагента",
+          "type": "string",
+          "example": "АО \"ТИНЬКОФФ БАНК\""
+        },
+        "bankSwiftCode": {
+          "description": "SWIFT-код банка контрагента",
+          "type": "string",
+          "example": "CHASUS33"
+        },
+        "corrAccount": {
+          "description": "Корр. счёт контрагента",
+          "type": "string",
+          "example": "30002340500001234056"
+        },
+        "inn": {
+          "description": "ИНН контрагента",
+          "type": "string",
+          "example": "366109554501"
+        },
+        "kpp": {
+          "description": "КПП контрагента",
+          "type": "string",
+          "example": "0"
+        },
+        "name": {
+          "description": "Наименование контрагента",
+          "type": "string",
+          "example": "Межрайонная ИФНС России № 17 по Воронежской области"
+        }
+      }
+    },
+    "description": {
+      "description": "Описание операции",
+      "type": "string",
+      "example": "Перевод собственных средств на счёт. НДС не облагается"
+    },
+    "authorizationDate": {
+      "description": "Дата авторизации",
+      "type": "string",
+      "example": "2022-07-06T00:00:00Z"
+    },
+    "trxnPostDate": {
+      "description": "Дата транзакции",
+      "type": "string",
+      "example": "2022-07-06T00:00:00Z"
+    },
+    "payVo": {
+      "description": "Тип платежа (буквенное значение)",
+      "type": "string",
+      "example": "payment-order"
+    },
+    "priority": {
+      "description": "Очерёдность",
+      "type": "string",
+      "example": "5"
+    },
+    "cardNumber": {
+      "description": "Маскированный номер карты",
+      "type": "string",
+      "example": "5534*****6400"
+    },
+    "ucid": {
+      "description": "UCID карты",
+      "type": "string",
+      "example": "1053539419"
+    },
+    "mcc": {
+      "description": "MCC",
+      "type": "string",
+      "example": "0010"
+    },
+    "merch": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "ID мерчанта",
+          "type": "string",
+          "example": "AT010452"
+        },
+        "address": {
+          "description": "Адрес мерчанта",
+          "type": "string",
+          "example": "13 VOLODARSKOGO STR"
+        },
+        "city": {
+          "description": "Город мерчанта",
+          "type": "string",
+          "example": "MOSCOW"
+        },
+        "country": {
+          "description": "Страна мерчанта",
+          "type": "string",
+          "example": "RUS"
+        },
+        "index": {
+          "description": "Почтовый индекс мерчанта",
+          "type": "string",
+          "example": "183038"
+        },
+        "name": {
+          "description": "Название мерчанта",
+          "type": "string",
+          "example": "Tinkoff.cc_trans"
+        }
+      }
+    },
+    "acquirerId": {
+      "description": "ID эквайера",
+      "type": "string",
+      "example": "17495726"
+    },
+    "status": {
+      "description": "Статус активности операции",
+      "type": "string",
+      "example": "Active"
+    },
+    "operationStatus": {
+      "description": "Статус операции",
+      "type": "string",
+      "example": "transaction"
+    },
+    "bic": {
+      "description": "БИК",
+      "type": "string",
+      "example": "044525974"
+    },
+    "rrn": {
+      "description": "RRN",
+      "type": "string",
+      "example": "8408475"
+    },
+    "category": {
+      "description": "Категория операции",
+      "type": "string",
+      "example": "fee"
+    },
+    "payPurpose": {
+      "description": "Назначение платежа",
+      "type": "string",
+      "example": "Оплата услуг по договору 17369058. НДС не облагается"
+    },
+    "receiver": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "description": "Номер счёта получателя",
+          "type": "string",
+          "example": "40702810510000710417"
+        },
+        "name": {
+          "description": "Наименование получателя",
+          "type": "string",
+          "example": "ИП Коркунов Александр Михайлович"
+        },
+        "inn": {
+          "description": "ИНН получателя",
+          "type": "string",
+          "example": "17499237465"
+        },
+        "kpp": {
+          "description": "КПП получателя",
+          "type": "string",
+          "example": "0"
+        },
+        "bic": {
+          "description": "БИК получателя",
+          "type": "string",
+          "example": "044525974"
+        },
+        "corrAccount": {
+          "description": "Корр. счёт получателя",
+          "type": "string",
+          "example": "30102810945250000974"
+        },
+        "bankName": {
+          "description": "Название банка контрагента",
+          "type": "string",
+          "example": "АО \"ТИНЬКОФФ БАНК\""
+        }
+      }
+    },
+    "payer": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "description": "Номер счёта плательщика",
+          "type": "string",
+          "example": "40702810510000710417"
+        },
+        "name": {
+          "description": "Наименование плательщика",
+          "type": "string",
+          "example": "ИП Коркунов Александр Михайлович"
+        },
+        "inn": {
+          "description": "ИНН плательщика",
+          "type": "string",
+          "example": "17499237465"
+        },
+        "kpp": {
+          "description": "КПП плательщика",
+          "type": "string",
+          "example": "0"
+        },
+        "bic": {
+          "description": "БИК банка плательщика",
+          "type": "string",
+          "example": "0044525974"
+        },
+        "corrAccount": {
+          "description": "Корр. счёт плательщика",
+          "type": "string",
+          "example": "30102810945250000974"
+        },
+        "bankName": {
+          "description": "Название банка контрагента",
+          "type": "string",
+          "example": "АО \"ТИНЬКОФФ БАНК\""
+        }
+      }
+    },
+    "drawDate": {
+      "description": "Дата списания",
+      "type": "string",
+      "example": "2022-07-06T00:00:00Z"
+    },
+    "chargeDate": {
+      "description": "Дата поступления распоряжения в банк",
+      "type": "string",
+      "example": "2022-07-06T00:00:00Z"
+    },
+    "kbk": {
+      "description": "КБК",
+      "type": "string",
+      "example": "18210501011011000110"
+    },
+    "oktmo": {
+      "description": "ОКТМО",
+      "type": "string",
+      "example": "34602403101"
+    },
+    "taxEvidence": {
+      "description": "Основание налогового платежа",
+      "type": "string",
+      "example": "тп"
+    },
+    "taxPeriod": {
+      "description": "Налоговый период / Код таможенного органа",
+      "type": "string",
+      "example": "ГД.00.2021"
+    },
+    "taxDocNumber": {
+      "description": "Номер налогового документа",
+      "type": "string",
+      "example": "0"
+    },
+    "taxDocDate": {
+      "description": "Дата налогового документа",
+      "type": "string",
+      "example": "0"
+    },
+    "nalType": {
+      "description": "Тип налогового документа",
+      "type": "string",
+      "example": "0"
+    },
+    "docDate": {
+      "description": "Дата документа",
+      "type": "string",
+      "example": "2022-07-06T00:00:00Z"
+    },
+    "VO": {
+      "description": "Вид операции (числовое значение)",
+      "type": "string",
+      "example": "17"
+    }
+  },
+  "required": [
+    "operationId",
+    "accountNumber",
+    "typeOfOperation",
+    "accountAmount",
+    "accountCurrencyDigitalCode",
+    "status",
+    "operationStatus",
+    "bic",
+    "category"
+  ]
+}
