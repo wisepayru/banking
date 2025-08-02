@@ -165,7 +165,7 @@ async def tbank_payment_status(
             detail="Error while processing 'payment-status' webhook"
         )
 
-@app.get("/healthcheck")
+@app.get("/webhooks/tbank/healthcheck")
 async def health_check():
     """Health check endpoint"""
     print(appinfo.name)
