@@ -17,4 +17,4 @@ ENV PYTHONDONTWRITEBYTECODE=1
 RUN useradd --create-home --shell /bin/bash app && chown -R app:app /app
 USER app
 
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8301", "--reload"]
