@@ -9,8 +9,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # copying all code into container
 COPY . .
 
-EXPOSE 8301
-
 # immediate stdout/stderr output + preventing .pyc file creation
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
