@@ -113,7 +113,7 @@ async def verify_token(credentials: HTTPAuthorizationCredentials = Depends(secur
         )
     return credentials.credentials
 
-@app.post("/tbank/oper-feed-operation")
+@app.post("/webhooks/tbank/oper-feed-operation")
 async def tbank_oper_feed_operation(
     operation: OperFeedOperation,
     token: str = Depends(verify_token)
@@ -139,7 +139,7 @@ async def tbank_oper_feed_operation(
             detail="Error while processing 'oper-feed-operation' webhook"
         )
 
-@app.post("/tbank/payment-status")
+@app.post("/webhooks/tbank/payment-status")
 async def tbank_payment_status(
     payment_status: PaymentStatus,
     token: str = Depends(verify_token)
