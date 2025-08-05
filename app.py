@@ -168,7 +168,6 @@ async def tbank_payment_status(
 @app.get("/webhooks/tbank/healthcheck")
 async def health_check():
     """Health check endpoint"""
-    print(appinfo.name)
     return {
         "status": "healthy", 
         "service": appinfo.app_name,
