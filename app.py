@@ -15,7 +15,7 @@ security = HTTPBearer()
 
 # load token from env
 if os.getenv('container'):
-    load_dotenv('/run/secrets/tbank-webhook-handler-secrets')
+    load_dotenv('/run/secrets/env')
 else:
     load_dotenv('.env')
 WEBHOOK_TOKEN = os.getenv("TBANK_WEBHOOK_TOKEN")
