@@ -1,24 +1,35 @@
-import appinfo
+import logging
 import os
+
+import appinfo
+from dotenv import load_dotenv
+
+# Load env vars FIRST so setup_logging() can read them
+if os.getenv('container'):
+    load_dotenv('/run/secrets/env')
+else:
+    load_dotenv('.env')
+
+from observability import setup_logging, TraceMiddleware  # noqa: E402
+
+setup_logging()
+
 import json
 import uvicorn
 from typing import Optional
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
-from dotenv import load_dotenv
 
-load_dotenv('.env')
+logger = logging.getLogger(__name__)
+
+WEBHOOK_TOKEN = os.getenv("TBANK_WEBHOOK_TOKEN")
 
 app = FastAPI(title=appinfo.app_name, version=appinfo.app_version)
+app.add_middleware(TraceMiddleware)
+
 security = HTTPBearer()
 
-# load token from env
-if os.getenv('container'):
-    load_dotenv('/run/secrets/env')
-else:
-    load_dotenv('.env')
-WEBHOOK_TOKEN = os.getenv("TBANK_WEBHOOK_TOKEN")
 
 # Pydantic models
 class CounterParty(BaseModel):
@@ -58,7 +69,7 @@ class Payer(BaseModel):
     bankName: Optional[str] = None
 
 class OperFeedOperation(BaseModel):
-    operationId: str  # Required field
+    operationId: str
     typeOfOperation: Optional[str] = None
     accountNumber: Optional[str] = None
     documentNumber: Optional[str] = None
@@ -99,11 +110,11 @@ class OperFeedOperation(BaseModel):
     VO: Optional[str] = None
 
 class PaymentStatus(BaseModel):
-    paymentId: str  # Required field
+    paymentId: str
     status: Optional[str] = None
     description: Optional[str] = None
 
-# auth dependency
+
 async def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
     if credentials.credentials != WEBHOOK_TOKEN:
         raise HTTPException(
@@ -112,6 +123,7 @@ async def verify_token(credentials: HTTPAuthorizationCredentials = Depends(secur
             headers={"WWW-Authenticate": "Bearer"},
         )
     return credentials.credentials
+
 
 @app.post("/webhooks/tbank/oper-feed-operation")
 async def tbank_oper_feed_operation(
@@ -123,21 +135,35 @@ async def tbank_oper_feed_operation(
     This endpoint receives notifications about new incoming payments on the company accounts.
     """
     try:
-        # logging the validated operation data as JSON
-        operation_json = operation.model_dump(exclude_none=True)
-        print(f"[OPER-FEED-OPERATION] Received operation: {json.dumps(operation_json, indent=2, ensure_ascii=False)}")
-        
+        operation_data = operation.model_dump(exclude_none=True)
+        logger.info(
+            "Received oper-feed-operation webhook",
+            extra={
+                "operation_id": operation.operationId,
+                "type_of_operation": operation.typeOfOperation,
+                "account_number": operation.accountNumber,
+                "operation_amount": operation.operationAmount,
+                "operation_currency": operation.operationCurrencyDigitalCode,
+                "operation_status": operation.operationStatus,
+                "operation": operation_data,
+            }
+        )
         return {
             "status": "success",
             "message": "'oper-feed-operation' webhook has been received and processed",
             "operationId": operation.operationId
         }
     except Exception as e:
-        print(f"[OPER-FEED-OPERATION] Error while processing 'oper-feed-operation' webhook: {str(e)}")
+        logger.error(
+            "Error processing oper-feed-operation webhook",
+            extra={"operation_id": operation.operationId},
+            exc_info=e
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error while processing 'oper-feed-operation' webhook"
         )
+
 
 @app.post("/webhooks/tbank/payment-status")
 async def tbank_payment_status(
@@ -149,30 +175,42 @@ async def tbank_payment_status(
     This endpoint receives status updates on payments that were made via T-Bank API.
     """
     try:
-        # logging the validated payment status data as JSON
-        payment_status_json = payment_status.model_dump(exclude_none=True)
-        print(f"[PAYMENT-STATUS] Received status update: {json.dumps(payment_status_json, indent=2, ensure_ascii=False)}")
-        
+        payment_data = payment_status.model_dump(exclude_none=True)
+        logger.info(
+            "Received payment-status webhook",
+            extra={
+                "payment_id": payment_status.paymentId,
+                "payment_status": payment_status.status,
+                "payment_description": payment_status.description,
+                "payment": payment_data,
+            }
+        )
         return {
             "status": "success",
             "message": "'payment-status' webhook has been received and processed",
             "paymentId": payment_status.paymentId
         }
     except Exception as e:
-        print(f"[PAYMENT-STATUS] Error while processing 'payment-status' webhook: {str(e)}")
+        logger.error(
+            "Error processing payment-status webhook",
+            extra={"payment_id": payment_status.paymentId},
+            exc_info=e
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error while processing 'payment-status' webhook"
         )
 
+
 @app.get("/webhooks/tbank/healthcheck")
 async def health_check():
     """Health check endpoint"""
     return {
-        "status": "healthy", 
+        "status": "healthy",
         "service": appinfo.app_name,
         "version": appinfo.app_version
     }
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
