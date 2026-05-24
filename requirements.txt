@@ -3,8 +3,4 @@ uvicorn[standard]
 pydantic
 python-dotenv
 python-multipart
-opentelemetry-api
-opentelemetry-sdk
-python-json-logger
-opensearch-py
-httpx
+wisepay-observability @ git+https://github.com/wisepayru/observability.git
