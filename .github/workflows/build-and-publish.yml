@@ -1,0 +1,71 @@
+name: build-and-publish
+
+# every push to master: build the arm64 image and push it to GHCR. pushing the tag is the whole deployment trigger —
+# flux image automation bumps the overlay from the registry — so the workflow itself touches nothing outside the runner
+on:
+  push:
+    branches: [master]
+
+concurrency:
+  # serialise builds: the ImagePolicy picks the newest image by sorting tags alphabetically, so two builds in flight
+  # at once could stamp the older commit with the later timestamp and leave it selected
+  group: publish
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04-arm
+    permissions:
+      # the registry credential is this run's own GITHUB_TOKEN, not a stored PAT
+      contents: read
+      packages: write
+    env:
+      IMAGE: ghcr.io/wisepayru/tbank-webhooks
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6.0.3
+
+      - name: Compute image tag
+        # master-<UTC timestamp>-<short sha>, timestamp in zero-padded basic format so an alphabetical sort is a
+        # chronological one. the ImagePolicy filters on exactly this pattern and ignores, silently, any tag that
+        # misses it — hence the assertion rather than a bare assignment
+        run: |
+          TAG="master-$(date -u +%Y%m%dT%H%M%SZ)-${GITHUB_SHA:0:7}"
+          printf '%s' "$TAG" | grep -qE '^master-[0-9]{8}T[0-9]{6}Z-[0-9a-f]{7,40}$' || {
+            echo "::error::computed tag '$TAG' does not match the tag pattern the ImagePolicy selects on"
+            exit 1
+          }
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+
+      - name: Build image
+        run: |
+          docker build --no-cache \
+            --label org.opencontainers.image.source="https://github.com/$GITHUB_REPOSITORY" \
+            --label org.opencontainers.image.revision="$GITHUB_SHA" \
+            --label org.opencontainers.image.version="$TAG" \
+            -f Containerfile \
+            -t "$IMAGE:$TAG" .
+          # a mislabelled runner or an edit to runs-on would publish amd64, and the tag and digest would look right
+          # while every pod crashed with exec format error
+          test "$(docker image inspect --format '{{.Architecture}}' "$IMAGE:$TAG")" = arm64
+
+      - name: Smoke-test image
+        # import-only: a dummy token so the module builds its bearer check; no request is served
+        run: |
+          docker run --rm -e container=1 -e TBANK_WEBHOOK_TOKEN=smoke --entrypoint python "$IMAGE:$TAG" -c "import app"
+
+      - name: Log in to GHCR
+        env:
+          GHCR_USER: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: printf '%s' "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+
+      - name: Push image
+        # no floating tag: the deployment pins tag and digest together, so a :latest here would be a second name
+        # nothing ever resolves by
+        run: |
+          docker push "$IMAGE:$TAG"
+          printf 'pushed %s\n' "$(docker inspect --format '{{index .RepoDigests 0}}' "$IMAGE:$TAG")" \
+            >> "$GITHUB_STEP_SUMMARY"

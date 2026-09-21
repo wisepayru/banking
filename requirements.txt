@@ -1,6 +1,41 @@
-fastapi
-uvicorn[standard]
-pydantic
-python-dotenv
-python-multipart
-wisepay-observability @ git+https://github.com/wisepayru/observability.git
+# every package is pinned, transitive ones included: the image builds with --no-cache, and an unpinned line makes the
+# same commit produce a different image on every push. to bump: resolve in a fresh venv on the image's python, run
+# pip-audit, then write the versions here
+annotated-doc==0.0.5
+annotated-types==0.8.0
+anyio==4.15.1
+certifi==2026.7.22
+charset-normalizer==3.5.1
+click==8.5.0
+Events==0.5
+fastapi==0.141.1
+grpcio==1.84.0
+h11==0.16.0
+httpcore==1.0.9
+httptools==0.8.0
+httpx==0.28.1
+idna==3.20
+opensearch-protobufs==1.2.0
+opensearch-py==3.2.0
+opentelemetry-api==1.44.0
+opentelemetry-sdk==1.44.0
+opentelemetry-semantic-conventions==0.65b0
+protobuf==7.36.2
+pydantic==2.13.5
+pydantic_core==2.46.5
+python-dateutil==2.9.0.post0
+python-dotenv==1.2.3
+python-json-logger==4.2.0
+python-multipart==0.0.32
+PyYAML==6.0.3
+requests==2.34.2
+six==1.17.0
+starlette==1.6.0
+typing-inspection==0.4.4
+typing_extensions==4.16.0
+urllib3==2.8.0
+uvicorn==0.53.0
+uvloop==0.22.1
+watchfiles==1.2.0
+websockets==17.1
+wisepay-observability @ git+https://github.com/wisepayru/observability.git@1.1.1
