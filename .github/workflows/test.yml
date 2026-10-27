@@ -1,0 +1,40 @@
+name: tests
+
+# the single source of truth for "did tests pass": runs on its own on pushes and PRs, and build-and-publish calls it
+# (workflow_call) so the image build gates on it without repeating the steps
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_call: {}
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    # pushes always run. PRs run only when the author is an org member or collaborator, so unreviewed or fork code
+    # never runs with this workflow's token. workflow_call passes through: the calling workflow only fires on pushes
+    # to master
+    if: >-
+      github.event_name != 'pull_request' ||
+      contains(fromJson('["OWNER","MEMBER","COLLABORATOR"]'), github.event.pull_request.author_association)
+    runs-on: ubuntu-24.04-arm
+    env:
+      PIP_NO_CACHE_DIR: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
+        with:
+          python-version: "3.14"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt -r requirements-test.txt
+
+      - name: Check dependencies
+        run: pip check
+
+      - name: Run tests
+        run: pytest
