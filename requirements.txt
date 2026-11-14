@@ -17,7 +17,7 @@ httpx==0.28.1
 idna==3.20
 opensearch-protobufs==1.2.0
 opensearch-py==3.2.0
-opentelemetry-api==1.45.1
+opentelemetry-api==1.45.2
 opentelemetry-sdk==1.45.1
 opentelemetry-semantic-conventions==0.66b1
 protobuf==7.36.2
